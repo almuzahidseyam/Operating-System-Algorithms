@@ -1,0 +1,21 @@
+{
+  "Final/fcfs.py": "fcfs",
+  "Final/sjf.py": "sjf",
+  "Final/srt.py": "srt",
+  "Final/rr.py": "rr",
+  "Final/priority_non.py": "priority",
+  "Final/priority_prim.py": "priority-preemptive",
+  "Final/fcfs_concurent.py": "fcfs",
+  "Final/same_python_file/first_come_first_serve.py": "fcfs",
+  "Final/same_python_file/shortest_job_first_non_preemptive.py": "sjf",
+  "Final/same_python_file/shortest_job_first_preemptive_SRT.py": "srt",
+  "Final/same_python_file/round_robin.py": "rr",
+  "Final/same_python_file/priority_non_primptive.py": "priority",
+  "Final/same_python_file/priority_primptive.py": "priority-preemptive",
+  "Final/same_python_file/fcfs_with_concurent_process.py": "fcfs",
+  "Mahbub Sir/1 FCFS.py": "fcfs",
+  "Mahbub Sir/2 SJF.py": "sjf",
+  "Mahbub Sir/3 Non-Preemptive Priority.py": "priority",
+  "Mahbub Sir/4 Round Robin.py": "rr",
+  "Mahbub Sir/5 Preemptive Priority.py": "priority-preemptive"
+}

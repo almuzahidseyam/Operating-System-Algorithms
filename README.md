@@ -1,94 +1,97 @@
-# Operating System
-###### 6th Semester
-### LAB
-* [Basic Linux Command](1%20Basic%20Linux%20Command.md) <br>
-* [Run a c program using terminal](2%20Run%20a%20C%20program%20using%20terminal.md)
-* [Run a c++ program using terminal](3%20Run%20a%20C++%20program%20using%20terminal.md)
-* [Run a java program using terminal](4%20Run%20a%20Java%20program%20using%20terminal.md)
+# Operating system laboratory
 
-### YouTube Playlist
-https://youtube.com/playlist?list=PLR6Sjm-9CZcZ5WI9Bo0HUb0dELRMx67ik
+Course notes and Python demonstrations for CPU scheduling, synchronization and deadlock handling.
 
+The six CPU scheduling algorithms now use one validated simulator in [`scheduling.py`](scheduling.py). The existing 19 scheduling script paths and seven scheduling notebooks call that shared implementation, so fixes do not need to be repeated across copies.
 
-# Operating System Code in Python 3<br/>[![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://www.python.org/) [![NumPy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white)](https://pypi.org/project/numpy/) [![SciPy](https://img.shields.io/badge/SciPy-%230C55A5.svg?style=for-the-badge&logo=scipy&logoColor=%white)](https://pypi.org/project/scipy/) [![Matplotlib](https://img.shields.io/badge/Matplotlib-%23ffffff.svg?style=for-the-badge&logo=Matplotlib&logoColor=black)](https://pypi.org/project/matplotlib/) ![OpenCV](https://img.shields.io/badge/opencv-%23white.svg?style=for-the-badge&logo=opencv&logoColor=white) ![Jupyter Notebook](https://img.shields.io/badge/jupyter-%23FA0F00.svg?style=for-the-badge&logo=jupyter&logoColor=white) ![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)
+## Run a scheduling simulation
 
-## Installations
+Python 3.12+ is sufficient; the scheduling simulator has no third-party dependencies.
 
-* **Python 3** can be downloaded from [here](https://www.python.org/downloads/). Make sure to check **Add Python 3.x to PATH** during installation.
-* **NumPy**, **SciPy**, and **matplotlib** **etc** libraries can be downloaded and installed using the commands:
-```bash
-pip install numpy
-pip install scipy
-pip install matplotlib
-pip install library-name
-```
-or if you have multiple python version installed use this
-```bash
-py -3.9 -m pip install numpy
-py -3.11 -m pip install numpy
-.....
+```sh
+python scheduling.py rr
+python scheduling.py fcfs
+python scheduling.py sjf
+python scheduling.py srt
+python scheduling.py priority
+python scheduling.py priority-preemptive
+
+# Existing entry paths still work:
+python Final/rr.py
+python "Mahbub Sir/4 Round Robin.py"
 ```
 
-## Code for Academic Course CIT-322 (Operating System Sessional)
+All CLI entry points now use the same prompt order: process count, each process’s arrival and burst, priority where applicable, then Round Robin quantum. IDs are assigned `P1`, `P2`, etc. The program prints completion, turnaround, waiting and first-response times, averages, CPU utilization from time zero, and a trace that includes idle intervals.
 
+| Algorithm | Rule |
+| --- | --- |
+| FCFS | Earliest arrival, non-preemptive |
+| SJF | Shortest burst among ready processes, non-preemptive |
+| SRT | Shortest remaining time, reevaluated on arrivals |
+| Round Robin | FIFO ready queue, at most one quantum per turn |
+| Priority | Larger numeric priority first, non-preemptive |
+| Preemptive priority | Larger numeric priority first, reevaluated on arrivals |
 
-<hr/>
+Equal choices use arrival time, then original input order. In Round Robin, processes arriving during or exactly at the end of a quantum enter the queue before the just-expired process is requeued. No context-switch cost, I/O blocking or priority aging is simulated.
 
-## `Mahabub Sir Part`
-<hr/>
+## Input and termination guarantees
 
-### First Come First Serve (FCFS) (With Different Arrival Time)
- [jupyter File](./first_come_first_serve.ipynb)     <br/>
- [Python File](./same_python_file/first_come_first_serve.py)
-### Shortest Job First Non-Preemptive (SJF) (With Different Arrival Time)
- [jupyter File](./shortest_job_first_non_preemptive.ipynb)     <br/>
- [Python File](./same_python_file/shortest_job_first_non_preemptive.py)
-### Shortest Job First Preemptive (SRT) (With Different Arrival Time)
- [jupyter File](./shortest_job_first_preemptive_SRT.ipynb)     <br/>
- [Python File](./same_python_file/shortest_job_first_preemptive_SRT.py)
-### Priority Primptive (With Different Arrival Time)
- [jupyter File](./priority_primptive.ipynb)     <br/>
- [Python File](./same_python_file/priority_primptive.py)
-### Priority Non-Primptive (With Different Arrival Time)
- [jupyter File](./priority_non_primptive.ipynb)     <br/>
- [Python File](./same_python_file/priority_non_primptive.py)
-### Round Robin (With Different Arrival Time)
- [jupyter File](./round_robin.ipynb)     <br/>
- [Python File](./same_python_file/round_robin.py)
-### FCFS With Concurent Process
- [jupyter File](./fcfs_with_concurent_process.ipynb)     <br/>
- [Python File](./same_python_file/fcfs_with_concurent_process.py)
+- Process count: **1–1,000**, with unique nonempty IDs for the programmatic API.
+- Arrivals: nonnegative. Bursts and Round Robin quantum: strictly positive.
+- Times: at most six decimal places, up to `1e9`. Internal integer micro-units avoid floating-point subtraction stalls. NaN, infinity and unrepresentable tiny times are rejected.
+- Priorities: integers in `-1e9..1e9`; larger means higher priority.
+- Round Robin rejects workloads whose estimated trace would exceed **200,000 slices**, before simulation starts. Increase the quantum or reduce the workload.
+- Invalid input exits with a readable error and nonzero status. Zero quantum and zero processes cannot enter a nonterminating simulation or divide by zero.
 
+Preemptive algorithms advance to the next arrival or completion rather than decrementing by one time unit, so fractional bursts finish correctly. Idle periods jump directly to the next arrival, and ready processes never wait merely because a later process has not arrived yet.
 
-<hr/><hr/>
+## Use from Python
 
-## `Masud Sir Part`
-<hr/>
+```python
+from scheduling import Process, schedule, print_result
 
-### Lab - 1 == Peterson Solution (Producer Consumer Problem)
- [jupyter File](./peterson_solution.ipynb)     <br/>
- [Python File](./same_python_file/peterson_solution.py) &nbsp;&nbsp; / &nbsp;&nbsp; [Python File Alternative](./same_python_file/peterson_solution_alternative.py)
+workload = [Process("A", 0, 4), Process("B", 2, 1)]
+result = schedule(workload, "rr", quantum=2)
+print_result(result)
+# Trace: A 0–2, B 2–3, A 3–5
+```
 
-### Lab - 2 == Mutex Lock (Protect Critical-Sections & Prevent Race-Conditions)
- [jupyter File](./mutex_lock.ipynb)     <br/>
- [Python File](./same_python_file/mutex_lock.py)
+Results use `Decimal` times. The input list and immutable `Process` objects are not mutated, and repeated calls do not share state. The old copy-specific, mutating class/function APIs have been replaced by this API; compatibility script filenames remain entry points only.
 
-### Lab - 3 == Semaphore Solution in Process-Synchronization (Producer Consumer Problem)
- [jupyter File](./semaphore_producer_consumer.ipynb)     <br/>
- [Python File](./same_python_file/semaphore_producer_consumer.py) &nbsp;&nbsp; / &nbsp;&nbsp; [Python File Alternative](./same_python_file/semaphore_producer_consumer_alternative.py)
+The files named `fcfs_concurent.py` and `fcfs_with_concurent_process.py` now refer to the single-CPU FCFS simulation. They do not launch real processes or claim to emulate the host OS scheduler.
 
-### Lab - 4 == Semaphore Solution in Process-Synchronization (Dining Philosopher Problem)
- [jupyter File](./semaphore_dining_philosopher.ipynb)     <br/>
- [Python File](./same_python_file/semaphore_dining_philosopher.py)
+## Notebooks
 
-### Lab - 5 == Banker’s Algorithm (Deadlock Avoidance)
- [jupyter File](./bankers_algorithm.ipynb)     <br/>
- [Python File](./same_python_file/bankers_algorithm.py) &nbsp;&nbsp; / &nbsp;&nbsp; [Python File Alternative 2](./same_python_file/bankers_algorithm_alternative_2.py) &nbsp;&nbsp; / &nbsp;&nbsp; [Python File Alternative 3](./same_python_file/bankers_algorithm_alternative_3.py) &nbsp;&nbsp; / &nbsp;&nbsp; [Python File Alternative 4](./same_python_file/bankers_algorithm_alternative_4.py)
+Open a notebook from inside the cloned repository so it can locate the shared simulator:
 
-### Lab - 6 == Deadlock Detection
- [jupyter File](./deadlock_detection.ipynb)     <br/>
- [Python File](./same_python_file/deadlock_detection.py) &nbsp;&nbsp; / &nbsp;&nbsp; [Python File Alternative](./same_python_file/deadlock_detection_alternative.py)
+| Topic | Notebook |
+| --- | --- |
+| FCFS | [First come, first served](Mahbub%20Sir/first_come_first_serve.ipynb) |
+| SJF | [Shortest job first](Mahbub%20Sir/shortest_job_first_non_preemptive.ipynb) |
+| SRT | [Shortest remaining time](Mahbub%20Sir/shortest_job_first_preemptive_SRT.ipynb) |
+| Round Robin | [Round Robin](Mahbub%20Sir/round_robin.ipynb) |
+| Priority | [Non-preemptive priority](Mahbub%20Sir/priority_non_primptive.ipynb) |
+| Preemptive priority | [Preemptive priority](Mahbub%20Sir/priority_primptive.ipynb) |
 
- 
+Install Jupyter separately if you want the notebook interface. Notebook code cells run without interactive input; edit their sample workload and rerun.
 
-<hr/>
+## Other course material
+
+Synchronization and deadlock classroom examples remain in [`Masud Sir/`](Masud%20Sir/) and the corresponding `Final/` files. They are separate teaching exercises, not part of the validated scheduling engine. Some intentionally demonstrate waiting, concurrency or deadlock; their behavior is not covered by the scheduling tests. Historical scheduling implementations remain in Git history.
+
+| Terminal lab | Notes |
+| --- | --- |
+| Linux basics | [Basic commands](Mid/1%20Basic%20Linux%20Command.md) |
+| C | [Compile and run](Mid/2%20Run%20a%20C%20program%20using%20terminal.md) |
+| C++ | [Compile and run](Mid/3%20Run%20a%20C++%20program%20using%20terminal.md) |
+| Java | [Compile and run](Mid/4%20Run%20a%20Java%20program%20using%20terminal.md) |
+
+## Verification
+
+```sh
+python -m unittest discover -s tests -v
+```
+
+Windows/Linux CI checks known traces for all six algorithms, quantum boundaries, fractional preemption, idle gaps, stable ties, invalid inputs, trace budgets, repeated calls, 180 randomized workload/algorithm combinations, every compatibility CLI and executable notebook cells. No real sleeps or system process scheduling are used by the simulator.
+
+[License](LICENSE)
